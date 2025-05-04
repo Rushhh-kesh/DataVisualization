@@ -361,10 +361,10 @@ def create_visualization():
         return jsonify({'error': str(e)}), 400
 
 
-# --- Run the App ---
 if __name__ == '__main__':
     # This is a one-time step to create the database and tables.
     # Run this once, then you can just run app.py normally.
     with app.app_context():
         db.create_all()
-    app.run(debug=True) # Set debug=False in production
+    # Remove or comment out the app.run() line:
+    # app.run(debug=True) # Set debug=False in production
