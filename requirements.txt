@@ -4,3 +4,5 @@ Flask-Login
 Werkzeug
 pandas
 plotly
+gunicorn
+psycopg2-binary
