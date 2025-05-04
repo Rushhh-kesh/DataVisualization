@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization Studio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.1/plotly.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS Variables for consistency (Matching loginpage.html) */
+        :root {
+            --primary-blue: #3498db;
+            --darker-blue: #2980b9;
+            --light-grey-bg: #f8f9fa;
+            --white-bg: #ffffff;
+            --text-primary: #343a40; /* Darker text for better contrast */
+            --text-secondary: #5a6268; /* Muted text */
+            --border-color: #dee2e6;
+            --error-red: #dc3545;
+            --success-green: #28a745;
+            --font-body: 'Inter', sans-serif;
+            --font-heading: 'Poppins', sans-serif;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-body); /* Default font for all elements */
+        }
+
+        body {
+            background: var(--light-grey-bg); /* Matching login page background */
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            padding: 20px; /* Consistent padding */
+        }
+
+        .container {
+            max-width: 1000px; /* Slightly adjusted max-width for visualization */
+            margin: 0 auto;
+            padding: 30px; /* Consistent padding */
+            background: var(--white-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        /* Header Styles */
+        .header {
+            text-align: center;
+            margin-bottom: 40px; /* Increased margin */
+            padding-top: 0; /* Removed top padding */
+            position: relative; /* Needed for logout link positioning */
+        }
+
+        .header h1 {
+            font-family: var(--font-heading); /* Matching heading font */
+            font-size: 2.2rem; /* Consistent size */
+            color: var(--text-primary);
+            margin-bottom: 10px; /* Adjusted margin */
+            font-weight: 700; /* Bolder */
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem; /* Adjusted size */
+            font-family: var(--font-body);
+        }
+
+        .logout-link {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .logout-link:hover {
+            color: var(--primary-blue);
+            text-decoration: underline;
+        }
+
+
+        /* Navigation */
+        .nav {
+            background: var(--light-grey-bg); /* Matching login page tab background */
+            border-radius: var(--border-radius); /* Rounded tabs */
+            padding: 5px; /* Adjusted padding */
+            margin-bottom: 30px; /* Increased margin */
+            display: flex;
+            gap: 5px; /* Adjusted gap */
+            border: 1px solid var(--border-color); /* Consistent border */
+            overflow: hidden; /* Hide sharp corners */
+        }
+
+        .nav-item {
+            flex: 1; /* Distribute space evenly */
+            padding: 12px 15px; /* Adjusted padding */
+            border-radius: var(--border-radius); /* Rounded items */
+            border: none;
+            background: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center text and icon */
+            gap: 8px; /* Adjusted gap */
+            font-weight: 500;
+            font-family: var(--font-heading); /* Matching button font */
+            font-size: 15px; /* Adjusted size */
+        }
+
+        .nav-item.active {
+            background: var(--primary-blue); /* Matching active tab background */
+            color: var(--white-bg); /* Matching active tab text color */
+            font-weight: 600;
+        }
+
+        .nav-item:hover:not(.active) {
+            background: #e9ecef; /* Subtle hover effect */
+            color: var(--text-primary); /* Darker text on hover */
+        }
+
+        .nav-item svg {
+            width: 20px; /* Adjusted icon size */
+            height: 20px; /* Adjusted icon size */
+            color: inherit; /* Inherit color from parent */
+        }
+
+        /* Main Content Area */
+        .content {
+            background: var(--white-bg); /* White background for content area */
+            border-radius: var(--border-radius);
+            padding: 30px; /* Consistent padding */
+            border: 1px solid var(--border-color);
+        }
+
+        /* Upload Section */
+        .upload-area {
+            border: 2px dashed var(--border-color); /* Consistent border style */
+            border-radius: var(--border-radius);
+            padding: 40px; /* Increased padding */
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--light-grey-bg); /* Light grey background */
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-blue);
+            background: #e9ecef; /* Lighter hover background */
+        }
+
+        .upload-icon {
+            width: 60px; /* Adjusted size */
+            height: 60px; /* Adjusted size */
+            margin: 0 auto 15px; /* Adjusted margin */
+            background: rgba(52, 152, 219, 0.1); /* Light blue background */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-icon svg {
+            width: 28px; /* Adjusted icon size */
+            height: 28px; /* Adjusted icon size */
+            color: var(--primary-blue);
+        }
+
+        .upload-area h2 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem; /* Adjusted size */
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .upload-area p {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+
+        /* Chart Selection */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Adjusted min width */
+            gap: 15px; /* Adjusted gap */
+            margin-bottom: 30px; /* Increased margin */
+        }
+
+        .chart-card {
+            background: var(--light-grey-bg); /* Light grey background */
+            border-radius: var(--border-radius);
+            padding: 20px; /* Adjusted padding */
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+            text-align: center; /* Center content */
+        }
+
+        .chart-card:hover {
+            border-color: var(--primary-blue);
+            background: #e9ecef; /* Lighter hover background */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Subtle hover shadow */
+        }
+
+        .chart-card.active {
+            background: rgba(52, 152, 219, 0.1); /* Light blue background */
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-card svg {
+            color: var(--primary-blue);
+            margin-bottom: 10px; /* Adjusted margin */
+            width: 40px; /* Adjusted size */
+            height: 40px; /* Adjusted size */
+        }
+
+        .chart-card h3 {
+            font-family: var(--font-heading);
+            font-size: 1.1rem; /* Adjusted size */
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px; /* Adjusted gap */
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow wrapping */
+            align-items: center; /* Align items vertically */
+        }
+
+        select {
+            background: var(--white-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 10px 15px; /* Adjusted padding */
+            border-radius: var(--border-radius);
+            min-width: 180px; /* Adjusted min-width */
+            font-size: 1rem;
+            font-family: var(--font-body);
+            cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            flex-grow: 1; /* Allow selects to grow */
+        }
+
+        select:focus {
+            border-color: var(--primary-blue);
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        button {
+            background: var(--primary-blue); /* Matching button color */
+            color: white;
+            border: none;
+            padding: 10px 20px; /* Adjusted padding */
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            font-weight: 600; /* Bolder */
+            font-family: var(--font-heading); /* Matching button font */
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background: var(--darker-blue);
+        }
+
+         button:active {
+             transform: translateY(1px);
+         }
+
+
+        /* Visualization Area */
+        #visualization {
+            width: 100%;
+            height: 500px; /* Keep height */
+            background: var(--white-bg); /* White background */
+            border-radius: var(--border-radius);
+            margin-top: 20px; /* Adjusted margin */
+            border: 1px solid var(--border-color);
+            overflow: hidden; /* Hide overflowing plot elements */
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px; /* Adjusted position */
+            right: 20px; /* Adjusted position */
+            background: var(--white-bg);
+            border: 1px solid var(--success-green); /* Success color */
+            color: var(--success-green);
+            padding: 12px 20px; /* Adjusted padding */
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transform: translateY(150%);
+            transition: transform 0.3s ease;
+            font-family: var(--font-body);
+            font-size: 14px;
+            z-index: 1000; /* Ensure toast is on top */
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            select, button {
+                width: 100%;
+                min-width: auto; /* Allow selects/buttons to shrink */
+            }
+
+            .chart-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Further adjust min width */
+                gap: 10px;
+            }
+
+            .chart-card {
+                padding: 15px;
+            }
+
+            .chart-card h3 {
+                font-size: 1.1rem;
+            }
+
+            #visualization {
+                height: 400px; /* Adjust height for smaller screens */
+            }
+
+            .toast {
+                bottom: 10px;
+                right: 10px;
+                left: 10px; /* Make toast full width on very small screens */
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+             body {
+                 padding: 10px;
+             }
+             .container {
+                 padding: 15px;
+             }
+             .header h1 {
+                 font-size: 1.8rem;
+             }
+             .header p {
+                 font-size: 0.9rem;
+             }
+             .upload-area {
+                 padding: 30px;
+             }
+             .upload-area h2 {
+                 font-size: 1.3rem;
+             }
+             .upload-area p {
+                 font-size: 0.9rem;
+             }
+             .chart-grid {
+                 grid-template-columns: 1fr; /* Stack chart cards */
+             }
+             #visualization {
+                 height: 300px;
+             }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Data Visualization Studio</h1>
+            <p>Welcome, {{ user.username }}!</p> {# Display logged-in username #}
+            <a href="{{ url_for('logout') }}" class="logout-link">Logout</a> {# Add Logout link #}
+        </header>
+
+        <nav class="nav">
+            <button class="nav-item active" data-tab="upload">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Upload
+            </button>
+            <button class="nav-item" data-tab="visualize">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                    <line x1="3" y1="15" x2="21" y2="15"/>
+                    <line x1="9" y1="9" x2="9" y2="21"/>
+                    <line x1="15" y1="9" x2="15" y2="21"/>
+                </svg>
+                Visualize
+            </button>
+        </nav>
+
+        <main class="content">
+            <div id="uploadSection">
+                <div class="upload-area" id="dropZone">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <h2>Upload Your Data</h2>
+                    <p>Drag and drop your file here or click to browse</p>
+                    <input type="file" id="fileInput" hidden accept=".csv,.xlsx,.xls">
+                </div>
+            </div>
+
+            <div id="visualizeSection" style="display: none;">
+                <div class="chart-grid">
+                    <div class="chart-card active" data-type="bar"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <line x1="8" y1="12" x2="8" y2="16"/>
+                            <line x1="12" y1="8" x2="12" y2="16"/>
+                            <line x1="16" y1="4" x2="16" y2="16"/>
+                        </svg>
+                        <h3>Bar Chart</h3>
+                    </div>
+                    <div class="chart-card" data-type="line">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12h18"/>
+                            <path d="M3 6h18"/>
+                            <path d="M3 18h18"/>
+                        </svg>
+                        <h3>Line Chart</h3>
+                    </div>
+                    <div class="chart-card" data-type="pie">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 2a10 10 0 0 1 10 10"/>
+                        </svg>
+                        <h3>Pie Chart</h3>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <select id="xColumn">
+                         <option value="">Select X Column</option>
+                    </select>
+                    <select id="yColumn">
+                         <option value="">Select Y Column</option>
+                    </select>
+                    <button onclick="createVisualization()">Generate Chart</button>
+                </div>
+
+                <div id="visualization"></div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="toast">File uploaded successfully!</div>
+
+    <script>
+        let currentFile = null;
+        let fileData = null;
+
+        // Function to read CSV file
+        async function readCSV(file) {
+            const text = await file.text();
+            const rows = text.split('\n').filter(row => row.trim() !== ''); // Filter out empty rows
+            const headers = rows[0].split(',').map(h => h.trim());
+
+            const data = rows.slice(1).map(row => {
+                const values = row.split(',');
+                const obj = {};
+                headers.forEach((header, i) => {
+                     // Handle potential missing values in rows
+                    obj[header] = values[i] ? values[i].trim() : '';
+                });
+                return obj;
+            });
+
+            return { headers, data };
+        }
+
+        // Function to read Excel file (Keep the alert for now as server-side is not fully implemented)
+        async function readExcel(file) {
+            alert('Excel support requires the SheetJS library. Please use CSV files for now.');
+            return { headers: [], data: [] };
+        }
+
+        // Function to populate dropdowns
+        function populateDropdowns(headers) {
+            const xColumn = document.getElementById('xColumn');
+            const yColumn = document.getElementById('yColumn');
+
+            // Clear existing options
+            xColumn.innerHTML = '';
+            yColumn.innerHTML = '';
+
+            // Add default option
+            xColumn.add(new Option('Select X Column', ''));
+            yColumn.add(new Option('Select Y Column', ''));
+
+            // Add column options
+            headers.forEach(header => {
+                xColumn.add(new Option(header, header));
+                yColumn.add(new Option(header, header));
+            });
+        }
+
+        // Updated file handler - Now sends file to server /upload endpoint
+        async function handleFile(file) {
+            if (file) {
+                try {
+                    currentFile = file; // Store file reference
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    const response = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || 'File upload failed');
+                    }
+
+                    const result = await response.json();
+                    // The server now returns columns and types
+
+                    // We don't need to read the file client-side for data structure anymore
+                    // The server handles parsing and returns column info.
+
+                    // Populate dropdowns using data from the server response
+                    populateDropdowns(result.columns);
+
+                    // Store the file object itself for client-side visualization later
+                    // This is a simplification; ideally, server would save and provide an ID.
+                    // For this example, we keep the file client-side for visualization call.
+                     fileData = {
+                         headers: result.columns,
+                         // Note: Data itself is not returned by /upload in this example.
+                         // If needed for client-side plotting, server /upload could return a sample or summary.
+                         // For createVisualization, we'll need to send the file *again* or refactor.
+                         // Sending the file again to /visualize for now, as per the original structure.
+                     };
+
+
+                    // Show success message
+                    toast.textContent = `File "${file.name}" uploaded successfully!`;
+                    toast.style.background = '#ffffff';
+                    toast.style.borderColor = '#28a745'; // Use actual value
+                    toast.style.color = '#28a745'; // Use actual value
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 3000);
+
+                    // Switch to visualize tab
+                    navItems[1].click();
+
+                    // Reset dropdowns and visualization area
+                    document.getElementById('xColumn').value = '';
+                    document.getElementById('yColumn').value = '';
+                    Plotly.purge('visualization'); // Clear previous plot
+
+                } catch (error) {
+                    toast.textContent = `Error: ${error.message}`;
+                    toast.style.background = '#FEE2E2';
+                    toast.style.borderColor = '#EF4444';
+                    toast.style.color = '#B91C1C';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 5000); // Show error for longer
+                }
+            }
+        }
+
+        // Navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = {
+            upload: document.getElementById('uploadSection'),
+            visualize: document.getElementById('visualizeSection')
+        };
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                const tab = item.dataset.tab;
+                Object.keys(sections).forEach(key => {
+                    sections[key].style.display = key === tab ? 'block' : 'none';
+                });
+            });
+        });
+
+        // File Upload
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const toast = document.getElementById('toast');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#3498db'; // Use actual value
+            dropZone.style.background = '#e9ecef';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '#dee2e6'; // Use actual value
+            dropZone.style.background = '#f8f9fa'; // Use actual value
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            handleFile(file);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            handleFile(file);
+        });
+
+        // Chart Selection
+        const chartCards = document.querySelectorAll('.chart-card');
+        let selectedChartType = 'bar'; // Default to bar chart
+
+        chartCards.forEach(card => {
+            card.addEventListener('click', () => {
+                chartCards.forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                selectedChartType = card.dataset.type;
+                // Optional: Auto-generate chart when type changes if columns are selected
+                // createVisualization();
+            });
+        });
+
+        // Create visualization - Now sends file and parameters to server /visualize
+        function createVisualization() {
+            const xColumn = document.getElementById('xColumn').value;
+            const yColumn = document.getElementById('yColumn').value;
+
+            if (!currentFile || !xColumn || !yColumn) { // Check for currentFile instead of fileData
+                 toast.textContent = 'Please upload data and select X and Y columns.';
+                 toast.style.background = '#fff3cd';
+                 toast.style.borderColor = '#ffeeba';
+                 toast.style.color = '#856404';
+                 toast.classList.add('show');
+                 setTimeout(() => toast.classList.remove('show'), 5000);
+                 return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', currentFile); // Send the file again
+            formData.append('chartType', selectedChartType);
+            formData.append('xColumn', xColumn);
+            formData.append('yColumn', yColumn);
+
+
+            fetch('/visualize', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                 if (!response.ok) {
+                     return response.json().then(errorData => {
+                         throw new Error(errorData.error || 'Chart generation failed');
+                     });
+                 }
+                 return response.json();
+             })
+            .then(data => {
+                if (data.plot) {
+                    const plotData = JSON.parse(data.plot);
+                    Plotly.newPlot('visualization', plotData.data, plotData.layout);
+                } else {
+                    throw new Error('No plot data received from server.');
+                }
+            })
+            .catch(error => {
+                toast.textContent = `Error: ${error.message}`;
+                toast.style.background = '#FEE2E2';
+                toast.style.borderColor = '#EF4444';
+                toast.style.color = '#B91C1C';
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 5000);
+                console.error('Visualization error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
