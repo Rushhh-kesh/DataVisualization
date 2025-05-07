@@ -10,7 +10,7 @@ import os # Import the os module to access environment variables
 
 # --- Flask App Configuration ---
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_default_secret_key_here') # Get from env var, with a default
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') # Get from env var, with a default
 # Get database URI from environment variable. Use a default SQLite for local dev if preferred.
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('postgresql://datavisualization_user:7CKbzDJlRKjlvMkrT7JjOOBR81zXQhMO@dpg-d0bm58buibrs73dflsp0-a/datavisualization', 'sqlite:///site.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Disable this to save resources
